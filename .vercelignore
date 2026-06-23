@@ -1,0 +1,3 @@
+# The backend deploys to Render, not Vercel — don't upload it.
+server
+docs

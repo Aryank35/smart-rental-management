@@ -8,6 +8,8 @@ import { RegisterPage } from '@/pages/auth/register'
 import { ForgotPasswordPage } from '@/pages/auth/forgot-password'
 import { ProfileSetupPage } from '@/pages/auth/profile-setup'
 import { ShowcasePage } from '@/pages/showcase'
+import { TenantDashboardPage } from '@/pages/tenant/dashboard'
+import { RentPage } from '@/pages/tenant/rent'
 import { PlaceholderPage } from '@/pages/placeholder-page'
 
 export const router = createBrowserRouter([
@@ -52,8 +54,8 @@ export const router = createBrowserRouter([
       {
         element: <DashboardLayout sections={tenantNav} basePath="/app" />,
         children: [
-          { path: '/app', element: <PlaceholderPage title="Dashboard" phase="Phase 3" /> },
-          { path: '/app/rent', element: <PlaceholderPage title="Rent" phase="Phase 4" /> },
+          { path: '/app', element: <TenantDashboardPage /> },
+          { path: '/app/rent', element: <RentPage /> },
           { path: '/app/bills', element: <PlaceholderPage title="Utility Bills" phase="Phase 5" /> },
           {
             path: '/app/complaints',

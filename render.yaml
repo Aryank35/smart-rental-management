@@ -1,0 +1,28 @@
+# Render Blueprint for the TenantFlow API.
+# In Render: New → Blueprint → connect this repo. Render reads this file.
+services:
+  - type: web
+    name: tenantflow-api
+    runtime: node
+    plan: free
+    rootDir: server
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      # Set this in the Render dashboard (your MongoDB Atlas connection string).
+      - key: MONGODB_URI
+        sync: false
+      # Render generates a strong secret once.
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_EXPIRES_IN
+        value: 7d
+      # Your Vercel production URL, e.g. https://tenantflow.vercel.app (set in dashboard).
+      - key: CLIENT_URL
+        sync: false
+      # Allow Vercel preview deployments (*.vercel.app) through CORS.
+      - key: ALLOW_VERCEL_PREVIEWS
+        value: "true"
+      - key: NODE_VERSION
+        value: "22"

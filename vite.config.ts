@@ -13,5 +13,13 @@ export default defineConfig({
   server: {
     port: 5173,
     open: false,
+    proxy: {
+      // Forward API calls to the backend during development so the browser
+      // talks to "/api" same-origin (no CORS headaches).
+      '/api': {
+        target: 'http://localhost:4000',
+        changeOrigin: true,
+      },
+    },
   },
 })

@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { FormField } from '@/components/ui/form-field'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { completeProfile } from '@/features/auth/mock-auth'
+import { completeProfile } from '@/features/auth/api'
 import { profileSetupSchema, type ProfileSetupInput } from '@/features/auth/schemas'
 import { homePathForRole, useAuthStore } from '@/stores/auth-store'
 import { toast } from '@/hooks/use-toast'
@@ -33,7 +33,7 @@ export function ProfileSetupPage() {
   })
 
   const mutation = useMutation({
-    mutationFn: (input: ProfileSetupInput) => completeProfile(user!.id, input, avatar),
+    mutationFn: (input: ProfileSetupInput) => completeProfile(input, avatar),
     onSuccess: (updated) => {
       setUser(updated)
       toast.success('Profile completed. Welcome to TenantFlow!')
