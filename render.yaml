@@ -5,8 +5,12 @@ services:
     name: tenantflow-api
     runtime: node
     plan: free
+    # IMPORTANT: rootDir must be "server" so Render builds the API, NOT the
+    # frontend at the repo root (the frontend deploys to Vercel).
     rootDir: server
-    buildCommand: npm install && npm run build
+    # --include=dev guarantees TypeScript/@types are present even if Render
+    # sets NODE_ENV=production (which would otherwise skip devDependencies).
+    buildCommand: npm install --include=dev && npm run build
     startCommand: npm start
     healthCheckPath: /api/health
     envVars:

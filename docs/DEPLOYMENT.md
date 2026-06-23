@@ -137,6 +137,8 @@ Open your Vercel URL, sign in with `tenant@tenantflow.app` / `password1`, and yo
 
 | Symptom | Fix |
 | --- | --- |
+| **Render build fails compiling `src/pages/...`, `src/router.tsx`, "Cannot find module 'react'", "Cannot find type definition file for 'node'"** | Render is building the **frontend** by mistake. Set the service's **Root Directory to `server`** (Settings → Build & Deploy → Root Directory), or redeploy via the Blueprint. The frontend belongs on Vercel, not Render. |
+| Render build: `tsc: not found` / missing `@types/*` | `NODE_ENV=production` is stripping devDependencies. The blueprint build command uses `npm install --include=dev` to prevent this; apply the same if you configured the service manually. |
 | Frontend loads but API calls fail with CORS error | `CLIENT_URL` on Render must equal your exact Vercel origin (no trailing slash). |
 | `Cannot reach the server` on first load | Render free tier is waking up (~30–60s). Retry. |
 | 401 right after deploy | `JWT_SECRET` changed → old tokens invalid. Sign in again. |
