@@ -40,7 +40,7 @@ Render reads [`render.yaml`](../render.yaml) at the repo root (a "Blueprint").
 
 1. Go to <https://dashboard.render.com> → **New** → **Blueprint**.
 2. Connect your GitHub repo. Render detects `render.yaml` and proposes a web service
-   named **tenantflow-api** (root directory `server/`).
+   named **tenantflow-api** (its build/start commands `cd` into `server/`).
 3. Click **Apply**. When prompted, fill in the env vars that are marked "sync: false":
    - **`MONGODB_URI`** → your Atlas connection string (with `/tenantflow` before the `?`).
    - **`CLIENT_URL`** → leave blank for now; you'll set it after Vercel gives you a URL
@@ -62,13 +62,18 @@ Render reads [`render.yaml`](../render.yaml) at the repo root (a "Blueprint").
 > **Render free tier** spins the service down after ~15 min idle; the next request takes
 > ~30–60s to wake. That's expected. The frontend shows a normal loading state meanwhile.
 
-**Not using the blueprint?** Create the service manually with:
-- Root directory: `server`
-- Build command: `npm install && npm run build`
-- Start command: `npm start`
-- Health check path: `/api/health`
-- Env vars: `MONGODB_URI`, `JWT_SECRET`, `JWT_EXPIRES_IN=7d`, `CLIENT_URL`, `ALLOW_VERCEL_PREVIEWS=true`
-- Do **not** set `NODE_ENV=production` (the build needs devDependencies like TypeScript).
+**Configuring the service manually (or fixing an existing one):** the backend runs
+directly with `tsx` (no compile step), and these commands `cd` into `server/` themselves,
+so you do **not** need to touch the Root Directory field:
+
+- **Build Command:** `cd server && npm install`
+- **Start Command:** `cd server && npm start`
+- **Health Check Path:** `/api/health`
+- Env vars: `MONGODB_URI`, `JWT_SECRET`, `CLIENT_URL`, `ALLOW_VERCEL_PREVIEWS=true`
+
+> Why `cd server`? Without it, Render runs the **repo-root** `npm run build`, which builds
+> the **frontend** (`tsc -b && vite build`) and fails with errors like
+> `Cannot find module 'react'`. The frontend belongs on Vercel — Render must only run `server/`.
 
 ---
 
@@ -137,8 +142,7 @@ Open your Vercel URL, sign in with `tenant@tenantflow.app` / `password1`, and yo
 
 | Symptom | Fix |
 | --- | --- |
-| **Render build fails compiling `src/pages/...`, `src/router.tsx`, "Cannot find module 'react'", "Cannot find type definition file for 'node'"** | Render is building the **frontend** by mistake. Set the service's **Root Directory to `server`** (Settings → Build & Deploy → Root Directory), or redeploy via the Blueprint. The frontend belongs on Vercel, not Render. |
-| Render build: `tsc: not found` / missing `@types/*` | `NODE_ENV=production` is stripping devDependencies. The blueprint build command uses `npm install --include=dev` to prevent this; apply the same if you configured the service manually. |
+| **Render build fails compiling `src/pages/...`, `src/router.tsx`, "Cannot find module 'react'", "Cannot find type definition file for 'node'"** | Render is building the **frontend** by mistake. Set **Build Command** = `cd server && npm install` and **Start Command** = `cd server && npm start`, then Clear build cache & deploy. The frontend belongs on Vercel, not Render. |
 | Frontend loads but API calls fail with CORS error | `CLIENT_URL` on Render must equal your exact Vercel origin (no trailing slash). |
 | `Cannot reach the server` on first load | Render free tier is waking up (~30–60s). Retry. |
 | 401 right after deploy | `JWT_SECRET` changed → old tokens invalid. Sign in again. |
