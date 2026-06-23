@@ -4,6 +4,8 @@ export type OccupancyStatus = 'active' | 'notice-period' | 'vacated'
 
 export type NoticeCategory = 'maintenance' | 'rent' | 'community' | 'emergency'
 
+export type UtilityBillType = 'electricity' | 'water'
+
 /** The tenant's current tenancy / room assignment. */
 export interface Tenancy {
   tenantName: string
@@ -86,6 +88,30 @@ export interface RentPayment {
   amount: number
   method: PaymentMethod | null
   status: PaymentStatus
+}
+
+export interface UtilityBill {
+  id: string
+  type: UtilityBillType
+  period: string
+  dueDate: string
+  paidOn: string | null
+  amount: number
+  method: PaymentMethod | null
+  status: PaymentStatus
+  receiptNo: string
+}
+
+export interface UtilityBillsSummary {
+  electricity: number
+  water: number
+  unpaidTotal: number
+  overdueTotal: number
+}
+
+export interface UtilityBillsDetails {
+  summary: UtilityBillsSummary
+  bills: UtilityBill[]
 }
 
 export interface TenantDashboard {

@@ -25,11 +25,20 @@ interface PayRentModalProps {
   onOpenChange: (open: boolean) => void
   amount: number
   period: string
+  title?: string
+  description?: string
 }
 
 const methods: PaymentMethod[] = ['UPI', 'Card', 'Net Banking', 'Cash']
 
-export function PayRentModal({ open, onOpenChange, amount, period }: PayRentModalProps) {
+export function PayRentModal({
+  open,
+  onOpenChange,
+  amount,
+  period,
+  title = 'Pay rent',
+  description = 'Settle your outstanding balance securely.',
+}: PayRentModalProps) {
   const [method, setMethod] = useState<PaymentMethod>('UPI')
   const [processing, setProcessing] = useState(false)
 
@@ -47,8 +56,8 @@ export function PayRentModal({ open, onOpenChange, amount, period }: PayRentModa
     <Modal open={open} onOpenChange={onOpenChange}>
       <ModalContent>
         <ModalHeader>
-          <ModalTitle>Pay rent</ModalTitle>
-          <ModalDescription>Settle your outstanding balance securely.</ModalDescription>
+          <ModalTitle>{title}</ModalTitle>
+          <ModalDescription>{description}</ModalDescription>
         </ModalHeader>
 
         <div className="rounded-lg border border-border bg-muted/40 p-4">

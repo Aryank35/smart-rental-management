@@ -1,5 +1,5 @@
 import { api } from '@/lib/api-client'
-import type { RentDetails, RentPayment, TenantDashboard } from './types'
+import type { RentDetails, RentPayment, TenantDashboard, UtilityBillsDetails } from './types'
 
 /** Tenant data API calls against the TenantFlow backend (MongoDB-backed). */
 
@@ -13,4 +13,8 @@ export function getRentDetails(): Promise<RentDetails> {
 
 export function getRentHistory(): Promise<RentPayment[]> {
   return api.get<RentPayment[]>('/tenant/rent/history')
+}
+
+export function getUtilityBills(): Promise<UtilityBillsDetails> {
+  return api.get<UtilityBillsDetails>('/tenant/bills')
 }

@@ -157,6 +157,43 @@ export async function getRentHistory(req: Request, res: Response) {
   )
 }
 
+export async function getUtilityBills(req: Request, res: Response) {
+  const userId = req.auth!.sub
+  await getTenancyOrThrow(userId)
+
+  const bills = await Bill.find({
+    user: userId,
+    type: { $in: ['electricity', 'water'] },
+  }).sort({ dueDate: -1 })
+
+  const billRows = bills.map((b) => ({
+    id: b._id.toString(),
+    type: b.type,
+    period: b.period,
+    dueDate: b.dueDate.toISOString(),
+    paidOn: b.paidOn ? b.paidOn.toISOString() : null,
+    amount: b.amount,
+    method: b.method ?? null,
+    status: effectiveStatus(b),
+    receiptNo: b.receiptNo,
+  }))
+
+  const unpaidBills = bills.filter(isUnpaid)
+  const overdueBills = bills.filter(isOverdue)
+  const latestByType = (type: 'electricity' | 'water') =>
+    bills.find((b) => b.type === type)?.amount ?? 0
+
+  res.json({
+    summary: {
+      electricity: latestByType('electricity'),
+      water: latestByType('water'),
+      unpaidTotal: unpaidBills.reduce((sum, b) => sum + b.amount, 0),
+      overdueTotal: overdueBills.reduce((sum, b) => sum + b.amount, 0),
+    },
+    bills: billRows,
+  })
+}
+
 function nextMonthDueDate(day: number) {
   const now = new Date()
   return new Date(now.getFullYear(), now.getMonth() + 1, day)
