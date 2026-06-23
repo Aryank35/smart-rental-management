@@ -1,5 +1,14 @@
-import { useQuery } from '@tanstack/react-query'
-import { getRentDetails, getRentHistory, getTenantDashboard, getUtilityBills } from './api'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import {
+  getComplaints,
+  getRentDetails,
+  getRentHistory,
+  getTenantDashboard,
+  getUtilityBills,
+  payBills,
+} from './api'
+import { formatCurrency } from '@/lib/utils'
+import { toast } from '@/hooks/use-toast'
 
 export const tenantKeys = {
   all: ['tenant'] as const,
@@ -7,6 +16,7 @@ export const tenantKeys = {
   rent: () => [...tenantKeys.all, 'rent'] as const,
   rentHistory: () => [...tenantKeys.all, 'rent', 'history'] as const,
   utilityBills: () => [...tenantKeys.all, 'bills'] as const,
+  complaints: () => [...tenantKeys.all, 'complaints'] as const,
 }
 
 export function useTenantDashboard() {
@@ -34,5 +44,31 @@ export function useUtilityBills() {
   return useQuery({
     queryKey: tenantKeys.utilityBills(),
     queryFn: getUtilityBills,
+  })
+}
+
+export function useComplaints() {
+  return useQuery({
+    queryKey: tenantKeys.complaints(),
+    queryFn: getComplaints,
+  })
+}
+
+/**
+ * Settle bills. On success, invalidates all tenant queries so the dashboard,
+ * rent, history, and bills views reflect the payment immediately.
+ */
+export function usePayBills() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: payBills,
+    onSuccess: (result) => {
+      queryClient.invalidateQueries({ queryKey: tenantKeys.all })
+      toast.success(
+        `${formatCurrency(result.totalPaid)} paid via ${result.method}.`,
+        'Payment successful'
+      )
+    },
+    onError: (err: Error) => toast.error(err.message, 'Payment failed'),
   })
 }

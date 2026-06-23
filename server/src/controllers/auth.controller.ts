@@ -3,6 +3,7 @@ import type { Request, Response } from 'express'
 import { User, toPublicUser, type UserDoc } from '../models/User.js'
 import { HttpError } from '../utils/http.js'
 import { signToken } from '../utils/token.js'
+import { provisionTenancy } from '../services/provision.js'
 import {
   forgotPasswordSchema,
   loginSchema,
@@ -73,6 +74,12 @@ export async function updateProfile(req: Request, res: Response) {
   }
   user.profileComplete = true
   await user.save()
+
+  // Give the new tenant a real tenancy + opening bills so the app works
+  // immediately (no dependency on seeded demo data). Idempotent.
+  if (user.role === 'tenant') {
+    await provisionTenancy(user._id.toString())
+  }
 
   res.json({ user: toPublicUser(user) })
 }

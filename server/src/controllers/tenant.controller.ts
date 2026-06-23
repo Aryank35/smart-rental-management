@@ -1,6 +1,8 @@
 import type { Request, Response } from 'express'
+import { z } from 'zod'
 import { Tenancy } from '../models/Tenancy.js'
 import { Bill, effectiveStatus, type BillDoc } from '../models/Bill.js'
+import { Complaint } from '../models/Complaint.js'
 import { Notice } from '../models/Notice.js'
 import { User } from '../models/User.js'
 import { HttpError } from '../utils/http.js'
@@ -11,6 +13,21 @@ const TYPE_LABEL: Record<string, string> = {
   water: 'Water',
   penalty: 'Penalty',
 }
+
+const paySchema = z.object({
+  method: z.enum(['UPI', 'Card', 'Net Banking', 'Cash']),
+  /** Specific bills to pay. If omitted, `scope` decides the set. */
+  billIds: z.array(z.string()).optional(),
+  scope: z.enum(['rent', 'utilities', 'all']).optional(),
+})
+
+const createComplaintSchema = z.object({
+  title: z.string().trim().min(4).max(80),
+  category: z.enum(['maintenance', 'plumbing', 'electrical', 'cleaning', 'security', 'other']),
+  priority: z.enum(['low', 'medium', 'high', 'urgent']).default('medium'),
+  location: z.string().trim().min(2).max(80),
+  description: z.string().trim().min(10).max(1000),
+})
 
 /** "June 2026" + type "rent" → "June Rent". */
 function billLabel(bill: BillDoc) {
@@ -191,6 +208,107 @@ export async function getUtilityBills(req: Request, res: Response) {
       overdueTotal: overdueBills.reduce((sum, b) => sum + b.amount, 0),
     },
     bills: billRows,
+  })
+}
+
+export async function payBills(req: Request, res: Response) {
+  const userId = req.auth!.sub
+  await getTenancyOrThrow(userId)
+
+  const { method, billIds, scope } = paySchema.parse(req.body)
+
+  const all = await Bill.find({ user: userId })
+  const unpaid = all.filter(isUnpaid)
+
+  // Resolve the target set so the amount charged matches what each page shows:
+  //  • rent page shows the OVERDUE rent + penalty balance
+  //  • bills page shows ALL unpaid (pending + overdue) utilities
+  let targets: BillDoc[]
+  if (billIds && billIds.length > 0) {
+    const wanted = new Set(billIds)
+    targets = unpaid.filter((b) => wanted.has(b._id.toString()))
+  } else if (scope === 'rent') {
+    targets = all.filter((b) => (b.type === 'rent' || b.type === 'penalty') && isOverdue(b))
+  } else if (scope === 'utilities') {
+    targets = unpaid.filter((b) => b.type === 'electricity' || b.type === 'water')
+  } else {
+    targets = unpaid // 'all'
+  }
+
+  if (targets.length === 0) {
+    throw new HttpError(400, 'No outstanding bills to pay.')
+  }
+
+  const paidOn = new Date()
+  await Bill.updateMany(
+    { _id: { $in: targets.map((b) => b._id) } },
+    { $set: { status: 'paid', paidOn, method } }
+  )
+
+  const totalPaid = targets.reduce((sum, b) => sum + b.amount, 0)
+  res.json({
+    paidCount: targets.length,
+    totalPaid,
+    method,
+    paidOn: paidOn.toISOString(),
+    receiptNos: targets.map((b) => b.receiptNo),
+  })
+}
+
+export async function getComplaints(req: Request, res: Response) {
+  const userId = req.auth!.sub
+  await getTenancyOrThrow(userId)
+
+  const complaints = await Complaint.find({ user: userId }).sort({ raisedAt: -1 })
+
+  res.json(
+    complaints.map((c) => ({
+      id: c._id.toString(),
+      title: c.title,
+      category: c.category,
+      priority: c.priority,
+      status: c.status,
+      description: c.description,
+      location: c.location,
+      referenceNo: c.referenceNo,
+      raisedAt: c.raisedAt.toISOString(),
+      updatedAt: c.updatedAt.toISOString(),
+      resolvedAt: c.resolvedAt ? c.resolvedAt.toISOString() : null,
+      assignedTo: c.assignedTo ?? null,
+    }))
+  )
+}
+
+export async function createComplaint(req: Request, res: Response) {
+  const userId = req.auth!.sub
+  await getTenancyOrThrow(userId)
+
+  const input = createComplaintSchema.parse(req.body)
+  const now = new Date()
+  const referenceNo = `CMP-${now.getFullYear()}-${Date.now().toString().slice(-6)}`
+
+  const complaint = await Complaint.create({
+    user: userId,
+    ...input,
+    status: 'open',
+    referenceNo,
+    raisedAt: now,
+    updatedAt: now,
+  })
+
+  res.status(201).json({
+    id: complaint._id.toString(),
+    title: complaint.title,
+    category: complaint.category,
+    priority: complaint.priority,
+    status: complaint.status,
+    description: complaint.description,
+    location: complaint.location,
+    referenceNo: complaint.referenceNo,
+    raisedAt: complaint.raisedAt.toISOString(),
+    updatedAt: complaint.updatedAt.toISOString(),
+    resolvedAt: null,
+    assignedTo: null,
   })
 }
 

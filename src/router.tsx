@@ -11,6 +11,7 @@ import { ShowcasePage } from '@/pages/showcase'
 import { TenantDashboardPage } from '@/pages/tenant/dashboard'
 import { RentPage } from '@/pages/tenant/rent'
 import { BillsPage } from '@/pages/tenant/bills'
+import { ComplaintsPage } from '@/pages/tenant/complaints'
 import { PlaceholderPage } from '@/pages/placeholder-page'
 
 export const router = createBrowserRouter([
@@ -58,10 +59,7 @@ export const router = createBrowserRouter([
           { path: '/app', element: <TenantDashboardPage /> },
           { path: '/app/rent', element: <RentPage /> },
           { path: '/app/bills', element: <BillsPage /> },
-          {
-            path: '/app/complaints',
-            element: <PlaceholderPage title="Complaints" phase="Phase 6" />,
-          },
+          { path: '/app/complaints', element: <ComplaintsPage /> },
           { path: '/app/notices', element: <PlaceholderPage title="Notices" phase="Phase 7" /> },
           {
             path: '/app/documents',

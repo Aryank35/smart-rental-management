@@ -6,6 +6,18 @@ export type NoticeCategory = 'maintenance' | 'rent' | 'community' | 'emergency'
 
 export type UtilityBillType = 'electricity' | 'water'
 
+export type ComplaintCategory =
+  | 'maintenance'
+  | 'plumbing'
+  | 'electrical'
+  | 'cleaning'
+  | 'security'
+  | 'other'
+
+export type ComplaintPriority = 'low' | 'medium' | 'high' | 'urgent'
+
+export type ComplaintStatus = 'open' | 'in-progress' | 'resolved' | 'closed'
+
 /** The tenant's current tenancy / room assignment. */
 export interface Tenancy {
   tenantName: string
@@ -112,6 +124,21 @@ export interface UtilityBillsSummary {
 export interface UtilityBillsDetails {
   summary: UtilityBillsSummary
   bills: UtilityBill[]
+}
+
+export interface Complaint {
+  id: string
+  title: string
+  category: ComplaintCategory
+  priority: ComplaintPriority
+  status: ComplaintStatus
+  description: string
+  location: string
+  referenceNo: string
+  raisedAt: string
+  updatedAt: string
+  resolvedAt: string | null
+  assignedTo: string | null
 }
 
 export interface TenantDashboard {

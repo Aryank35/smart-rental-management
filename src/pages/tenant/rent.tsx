@@ -2,7 +2,12 @@ import { useState } from 'react'
 import { PageContainer } from '@/components/layout/page-container'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
-import { useRentDetails, useRentHistory, useTenantDashboard } from '@/features/tenant/queries'
+import {
+  useRentDetails,
+  useRentHistory,
+  useTenantDashboard,
+  usePayBills,
+} from '@/features/tenant/queries'
 import { RentSummary, RentSummarySkeleton } from './components/rent-summary'
 import {
   PaymentHistoryTable,
@@ -14,6 +19,7 @@ export function RentPage() {
   const rent = useRentDetails()
   const history = useRentHistory()
   const dashboard = useTenantDashboard()
+  const payMutation = usePayBills()
   const [payOpen, setPayOpen] = useState(false)
 
   const isError = rent.isError || history.isError
@@ -68,6 +74,7 @@ export function RentPage() {
           onOpenChange={setPayOpen}
           amount={rent.data.outstandingBalance}
           period="Outstanding balance"
+          onConfirm={(method) => payMutation.mutateAsync({ scope: 'rent', method })}
         />
       )}
     </PageContainer>

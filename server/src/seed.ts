@@ -5,6 +5,7 @@ import { connectDB } from './config/db.js'
 import { User } from './models/User.js'
 import { Tenancy } from './models/Tenancy.js'
 import { Bill } from './models/Bill.js'
+import { Complaint } from './models/Complaint.js'
 import { Notice } from './models/Notice.js'
 
 const MONTHS = [
@@ -65,6 +66,7 @@ export async function seedDatabase() {
     User.deleteMany({}),
     Tenancy.deleteMany({}),
     Bill.deleteMany({}),
+    Complaint.deleteMany({}),
     Notice.deleteMany({}),
   ])
 
@@ -162,6 +164,49 @@ export async function seedDatabase() {
       date: new Date('2026-06-15'),
       excerpt: 'Join residents at the terrace lounge on 15 Aug, 6 PM onwards.',
       readBy: [tenant._id],
+    },
+  ])
+
+  await Complaint.insertMany([
+    {
+      user: tenant._id,
+      title: 'Kitchen sink leakage',
+      category: 'plumbing',
+      priority: 'high',
+      status: 'in-progress',
+      description: 'The sink pipe is leaking under the counter and water collects after use.',
+      location: 'Room 204 kitchen',
+      referenceNo: 'CMP-2026-1042',
+      raisedAt: new Date('2026-06-20T10:30:00'),
+      updatedAt: new Date('2026-06-22T15:45:00'),
+      assignedTo: 'Maintenance team',
+    },
+    {
+      user: tenant._id,
+      title: 'Corridor light flickering',
+      category: 'electrical',
+      priority: 'medium',
+      status: 'open',
+      description: 'The light outside room 204 keeps flickering at night.',
+      location: 'Second floor corridor',
+      referenceNo: 'CMP-2026-1088',
+      raisedAt: new Date('2026-06-22T19:15:00'),
+      updatedAt: new Date('2026-06-22T19:15:00'),
+      assignedTo: null,
+    },
+    {
+      user: tenant._id,
+      title: 'Bathroom exhaust fan repaired',
+      category: 'maintenance',
+      priority: 'low',
+      status: 'resolved',
+      description: 'The exhaust fan had stopped working and needed inspection.',
+      location: 'Room 204 bathroom',
+      referenceNo: 'CMP-2026-0977',
+      raisedAt: new Date('2026-06-12T09:00:00'),
+      updatedAt: new Date('2026-06-14T12:20:00'),
+      resolvedAt: new Date('2026-06-14T12:20:00'),
+      assignedTo: 'Ravi Kumar',
     },
   ])
 

@@ -16,7 +16,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { toast } from '@/hooks/use-toast'
 import { formatCurrency } from '@/lib/utils'
 import type { PaymentMethod } from '@/features/tenant/types'
 
@@ -27,6 +26,8 @@ interface PayRentModalProps {
   period: string
   title?: string
   description?: string
+  /** Settle the bills with the chosen method. Resolves on success. */
+  onConfirm: (method: PaymentMethod) => Promise<unknown>
 }
 
 const methods: PaymentMethod[] = ['UPI', 'Card', 'Net Banking', 'Cash']
@@ -38,18 +39,21 @@ export function PayRentModal({
   period,
   title = 'Pay rent',
   description = 'Settle your outstanding balance securely.',
+  onConfirm,
 }: PayRentModalProps) {
   const [method, setMethod] = useState<PaymentMethod>('UPI')
   const [processing, setProcessing] = useState(false)
 
-  function handlePay() {
+  async function handlePay() {
     setProcessing(true)
-    // Mock payment gateway round-trip.
-    setTimeout(() => {
+    try {
+      await onConfirm(method)
+      onOpenChange(false) // close only on success; toasts handled by the caller
+    } catch {
+      // Error toast is surfaced by the mutation; keep the modal open to retry.
+    } finally {
       setProcessing(false)
-      onOpenChange(false)
-      toast.success(`${formatCurrency(amount)} paid via ${method}.`, 'Payment successful')
-    }, 1200)
+    }
   }
 
   return (

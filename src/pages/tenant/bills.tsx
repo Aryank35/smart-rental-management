@@ -16,7 +16,7 @@ import {
   TableRow,
   TableWrapper,
 } from '@/components/ui/table'
-import { useUtilityBills } from '@/features/tenant/queries'
+import { usePayBills, useUtilityBills } from '@/features/tenant/queries'
 import { paymentStatusBadge } from '@/features/tenant/utils'
 import type { UtilityBill, UtilityBillType } from '@/features/tenant/types'
 import { cn, formatCurrency, formatDate, relativeDueLabel } from '@/lib/utils'
@@ -41,6 +41,7 @@ function billTypeLabel(type: UtilityBillType) {
 
 export function BillsPage() {
   const bills = useUtilityBills()
+  const payMutation = usePayBills()
   const [payOpen, setPayOpen] = useState(false)
 
   const unpaidBills = useMemo(
@@ -121,6 +122,7 @@ export function BillsPage() {
           period="Utility bill dues"
           title="Pay utility bills"
           description="Settle your electricity and water dues securely."
+          onConfirm={(method) => payMutation.mutateAsync({ scope: 'utilities', method })}
         />
       )}
     </PageContainer>
