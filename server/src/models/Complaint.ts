@@ -3,6 +3,7 @@ import { Schema, model, type InferSchemaType, type Types } from 'mongoose'
 const complaintSchema = new Schema(
   {
     user: { type: Schema.Types.ObjectId, ref: 'User', required: true, index: true },
+    org: { type: Schema.Types.ObjectId, ref: 'Organization', required: true, index: true },
     title: { type: String, required: true, trim: true },
     category: {
       type: String,
@@ -27,6 +28,8 @@ const complaintSchema = new Schema(
     updatedAt: { type: Date, default: Date.now },
     resolvedAt: { type: Date, default: null },
     assignedTo: { type: String, default: null },
+    /** Admin's note when resolving / updating the complaint. */
+    resolutionNote: { type: String, default: null },
   },
   { timestamps: true }
 )

@@ -66,7 +66,30 @@ export interface Notice {
   /** ISO publish date. */
   date: string
   excerpt: string
+  /** Full announcement text (present on the notices list, not the dashboard feed). */
+  body?: string
   read: boolean
+}
+
+export interface TenantDocument {
+  id: string
+  title: string
+  category: 'agreement' | 'receipt' | 'id-proof' | 'notice' | 'other'
+  fileName: string
+  mimeType: string
+  sizeBytes: number
+  createdAt: string
+}
+
+export interface TenantPayment {
+  id: string
+  type: UtilityBillType | 'rent' | 'penalty'
+  label: string
+  period: string
+  amount: number
+  method: PaymentMethod
+  paidOn: string
+  receiptNo: string
 }
 
 export type PaymentMethod = 'UPI' | 'Card' | 'Net Banking' | 'Cash'

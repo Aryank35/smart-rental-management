@@ -12,7 +12,20 @@ import { TenantDashboardPage } from '@/pages/tenant/dashboard'
 import { RentPage } from '@/pages/tenant/rent'
 import { BillsPage } from '@/pages/tenant/bills'
 import { ComplaintsPage } from '@/pages/tenant/complaints'
-import { PlaceholderPage } from '@/pages/placeholder-page'
+import { TenantNoticesPage } from '@/pages/tenant/notices'
+import { TenantDocumentsPage } from '@/pages/tenant/documents'
+import { TenantPaymentsPage } from '@/pages/tenant/payments'
+import { TenantSettingsPage } from '@/pages/tenant/settings'
+import { AdminDashboardPage } from '@/pages/admin/dashboard'
+import { AdminPropertiesPage } from '@/pages/admin/properties'
+import { AdminPropertyDetailPage } from '@/pages/admin/property-detail'
+import { AdminTenantsPage } from '@/pages/admin/tenants'
+import { AdminBillingPage } from '@/pages/admin/billing'
+import { AdminPaymentsPage } from '@/pages/admin/payments'
+import { AdminComplaintsPage } from '@/pages/admin/complaints'
+import { AdminNoticesPage } from '@/pages/admin/notices'
+import { AdminDocumentsPage } from '@/pages/admin/documents'
+import { AdminSettingsPage } from '@/pages/admin/settings'
 
 export const router = createBrowserRouter([
   { path: '/', element: <Navigate to="/login" replace /> },
@@ -23,7 +36,7 @@ export const router = createBrowserRouter([
     children: [{ path: '/components', element: <ShowcasePage /> }],
   },
 
-  // Auth — redirect signed-in users away (Phase 2).
+  // Auth — redirect signed-in users away.
   {
     element: <PublicOnlyRoute />,
     children: [
@@ -49,7 +62,7 @@ export const router = createBrowserRouter([
     ],
   },
 
-  // Tenant portal (Phases 3–9).
+  // Tenant portal.
   {
     element: <ProtectedRoute role="tenant" />,
     children: [
@@ -60,46 +73,32 @@ export const router = createBrowserRouter([
           { path: '/app/rent', element: <RentPage /> },
           { path: '/app/bills', element: <BillsPage /> },
           { path: '/app/complaints', element: <ComplaintsPage /> },
-          { path: '/app/notices', element: <PlaceholderPage title="Notices" phase="Phase 7" /> },
-          {
-            path: '/app/documents',
-            element: <PlaceholderPage title="Documents" phase="Phase 8" />,
-          },
-          { path: '/app/payments', element: <PlaceholderPage title="Payments" phase="Phase 4" /> },
-          { path: '/app/settings', element: <PlaceholderPage title="Settings" phase="Phase 9" /> },
+          { path: '/app/notices', element: <TenantNoticesPage /> },
+          { path: '/app/documents', element: <TenantDocumentsPage /> },
+          { path: '/app/payments', element: <TenantPaymentsPage /> },
+          { path: '/app/settings', element: <TenantSettingsPage /> },
         ],
       },
     ],
   },
 
-  // Admin portal (Phases 10–22).
+  // Admin portal.
   {
     element: <ProtectedRoute role="admin" />,
     children: [
       {
         element: <DashboardLayout sections={adminNav} basePath="/admin" />,
         children: [
-          { path: '/admin', element: <PlaceholderPage title="Admin Dashboard" phase="Phase 10" /> },
-          {
-            path: '/admin/properties',
-            element: <PlaceholderPage title="Properties" phase="Phase 11" />,
-          },
-          { path: '/admin/tenants', element: <PlaceholderPage title="Tenants" phase="Phase 13" /> },
-          { path: '/admin/billing', element: <PlaceholderPage title="Billing" phase="Phase 14" /> },
-          {
-            path: '/admin/payments',
-            element: <PlaceholderPage title="Payments" phase="Phase 15" />,
-          },
-          {
-            path: '/admin/complaints',
-            element: <PlaceholderPage title="Complaints" phase="Phase 16" />,
-          },
-          { path: '/admin/notices', element: <PlaceholderPage title="Notices" phase="Phase 17" /> },
-          {
-            path: '/admin/documents',
-            element: <PlaceholderPage title="Documents" phase="Phase 18" />,
-          },
-          { path: '/admin/settings', element: <PlaceholderPage title="Settings" phase="Phase 21" /> },
+          { path: '/admin', element: <AdminDashboardPage /> },
+          { path: '/admin/properties', element: <AdminPropertiesPage /> },
+          { path: '/admin/properties/:id', element: <AdminPropertyDetailPage /> },
+          { path: '/admin/tenants', element: <AdminTenantsPage /> },
+          { path: '/admin/billing', element: <AdminBillingPage /> },
+          { path: '/admin/payments', element: <AdminPaymentsPage /> },
+          { path: '/admin/complaints', element: <AdminComplaintsPage /> },
+          { path: '/admin/notices', element: <AdminNoticesPage /> },
+          { path: '/admin/documents', element: <AdminDocumentsPage /> },
+          { path: '/admin/settings', element: <AdminSettingsPage /> },
         ],
       },
     ],

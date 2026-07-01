@@ -3,6 +3,7 @@ import cors from 'cors'
 import { env } from './config/env.js'
 import { authRouter } from './routes/auth.routes.js'
 import { tenantRouter } from './routes/tenant.routes.js'
+import { adminRouter } from './routes/admin.routes.js'
 import { errorHandler, notFound } from './middleware/error.js'
 
 export function createApp() {
@@ -27,6 +28,7 @@ export function createApp() {
   app.get('/api/health', (_req, res) => res.json({ status: 'ok' }))
   app.use('/api/auth', authRouter)
   app.use('/api/tenant', tenantRouter)
+  app.use('/api/admin', adminRouter)
 
   app.use(notFound)
   app.use(errorHandler)

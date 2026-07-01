@@ -32,6 +32,11 @@ export const loginSchema = z.object({
 export const registerSchema = z
   .object({
     name: z.string().trim().min(2, 'Name is too short').max(60, 'Name is too long'),
+    orgName: z
+      .string()
+      .trim()
+      .min(2, 'Business name is too short')
+      .max(80, 'Business name is too long'),
     email: z.string().trim().email('Enter a valid email'),
     phone: phoneSchema,
     password: passwordSchema,

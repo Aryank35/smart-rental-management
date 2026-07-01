@@ -4,6 +4,7 @@ import { Tenancy } from '../models/Tenancy.js'
 import { Bill, effectiveStatus, type BillDoc } from '../models/Bill.js'
 import { Complaint } from '../models/Complaint.js'
 import { Notice } from '../models/Notice.js'
+import { DocumentModel } from '../models/Document.js'
 import { User } from '../models/User.js'
 import { HttpError } from '../utils/http.js'
 
@@ -51,11 +52,11 @@ async function getTenancyOrThrow(userId: string) {
 
 export async function getDashboard(req: Request, res: Response) {
   const userId = req.auth!.sub
-  const [user, tenancy, bills, notices] = await Promise.all([
+  const tenancy = await getTenancyOrThrow(userId)
+  const [user, bills, notices] = await Promise.all([
     User.findById(userId),
-    getTenancyOrThrow(userId),
     Bill.find({ user: userId }).sort({ dueDate: -1 }),
-    Notice.find().sort({ date: -1 }).limit(5),
+    Notice.find({ org: tenancy.org }).sort({ date: -1 }).limit(5),
   ])
   if (!user) throw new HttpError(404, 'User not found.')
 
@@ -281,7 +282,7 @@ export async function getComplaints(req: Request, res: Response) {
 
 export async function createComplaint(req: Request, res: Response) {
   const userId = req.auth!.sub
-  await getTenancyOrThrow(userId)
+  const tenancy = await getTenancyOrThrow(userId)
 
   const input = createComplaintSchema.parse(req.body)
   const now = new Date()
@@ -289,6 +290,7 @@ export async function createComplaint(req: Request, res: Response) {
 
   const complaint = await Complaint.create({
     user: userId,
+    org: tenancy.org,
     ...input,
     status: 'open',
     referenceNo,
@@ -315,4 +317,83 @@ export async function createComplaint(req: Request, res: Response) {
 function nextMonthDueDate(day: number) {
   const now = new Date()
   return new Date(now.getFullYear(), now.getMonth() + 1, day)
+}
+
+export async function getNotices(req: Request, res: Response) {
+  const userId = req.auth!.sub
+  const tenancy = await getTenancyOrThrow(userId)
+  const notices = await Notice.find({ org: tenancy.org }).sort({ date: -1 })
+
+  res.json(
+    notices.map((n) => ({
+      id: n._id.toString(),
+      title: n.title,
+      category: n.category,
+      date: n.date.toISOString(),
+      excerpt: n.excerpt,
+      body: n.body ?? '',
+      read: n.readBy?.some((id) => id.toString() === userId) ?? false,
+    }))
+  )
+}
+
+export async function markNoticeRead(req: Request, res: Response) {
+  const userId = req.auth!.sub
+  const tenancy = await getTenancyOrThrow(userId)
+  const notice = await Notice.findOne({ _id: req.params.id, org: tenancy.org })
+  if (!notice) throw new HttpError(404, 'Notice not found.')
+  await Notice.updateOne({ _id: notice._id }, { $addToSet: { readBy: userId } })
+  res.json({ ok: true })
+}
+
+export async function getPaymentHistory(req: Request, res: Response) {
+  const userId = req.auth!.sub
+  await getTenancyOrThrow(userId)
+  const bills = await Bill.find({ user: userId, paidOn: { $ne: null } }).sort({ paidOn: -1 })
+
+  res.json(
+    bills.map((b) => ({
+      id: b._id.toString(),
+      type: b.type,
+      label: billLabel(b),
+      period: b.period,
+      amount: b.amount,
+      method: b.method ?? 'Cash',
+      paidOn: b.paidOn!.toISOString(),
+      receiptNo: b.receiptNo,
+    }))
+  )
+}
+
+export async function getDocuments(req: Request, res: Response) {
+  const userId = req.auth!.sub
+  const tenancy = await getTenancyOrThrow(userId)
+  const docs = await DocumentModel.find({
+    org: tenancy.org,
+    $or: [{ audience: 'all' }, { audience: 'tenant', tenant: userId }],
+  }).sort({ createdAt: -1 })
+
+  res.json(
+    docs.map((d) => ({
+      id: d._id.toString(),
+      title: d.title,
+      category: d.category,
+      fileName: d.fileName,
+      mimeType: d.mimeType,
+      sizeBytes: d.sizeBytes,
+      createdAt: d.createdAt.toISOString(),
+    }))
+  )
+}
+
+export async function downloadDocument(req: Request, res: Response) {
+  const userId = req.auth!.sub
+  const tenancy = await getTenancyOrThrow(userId)
+  const doc = await DocumentModel.findOne({
+    _id: req.params.id,
+    org: tenancy.org,
+    $or: [{ audience: 'all' }, { audience: 'tenant', tenant: userId }],
+  }).select('+dataUrl')
+  if (!doc) throw new HttpError(404, 'Document not found.')
+  res.json({ fileName: doc.fileName, mimeType: doc.mimeType, dataUrl: doc.dataUrl })
 }

@@ -30,8 +30,11 @@ export function useAuth() {
     mutationFn: (input: RegisterInput) => authApi.register(input),
     onSuccess: (session) => {
       setSession(session)
-      toast.success('Account created. Let’s set up your profile.')
-      navigate('/profile-setup', { replace: true })
+      toast.success(`Welcome, ${session.user.name.split(' ')[0]}! Your workspace is ready.`)
+      navigate(
+        session.user.profileComplete ? homePathForRole(session.user.role) : '/profile-setup',
+        { replace: true }
+      )
     },
     onError: (err: Error) => toast.error(err.message, 'Registration failed'),
   })

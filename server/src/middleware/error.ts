@@ -20,6 +20,15 @@ export function errorHandler(err: unknown, _req: Request, res: Response, _next: 
     return res.status(err.status).json({ message: err.message })
   }
 
+  // Malformed ObjectId in a route param / body.
+  if (err instanceof mongoose.Error.CastError) {
+    return res.status(400).json({ message: 'Invalid identifier.' })
+  }
+
+  if (err instanceof mongoose.Error.ValidationError) {
+    return res.status(422).json({ message: 'Validation failed.', errors: {} })
+  }
+
   // Duplicate key (e.g. email/phone already registered).
   if (err instanceof mongoose.mongo.MongoServerError && err.code === 11000) {
     const field = Object.keys(err.keyPattern ?? { field: 1 })[0]

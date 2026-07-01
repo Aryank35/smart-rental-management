@@ -79,7 +79,7 @@ export function LoginPage() {
       <div className="rounded-md border border-dashed border-border bg-muted/40 p-3 text-center text-xs text-muted-foreground">
         Demo: <span className="font-medium text-foreground">tenant@tenantflow.app</span> or{' '}
         <span className="font-medium text-foreground">admin@tenantflow.app</span> ·{' '}
-        <span className="font-medium text-foreground">password1</span>
+        <span className="font-medium text-foreground">TenantFlow@2026</span>
       </div>
 
       <p className="text-center text-sm text-muted-foreground">

@@ -14,6 +14,13 @@ export const registerSchema = z.object({
   email: z.string().trim().toLowerCase().email(),
   phone: phoneField,
   password: z.string().min(8),
+  /** Landlord signup creates an organization with this name. */
+  orgName: z.string().trim().min(2).max(80),
+})
+
+export const changePasswordSchema = z.object({
+  currentPassword: z.string().min(1),
+  newPassword: z.string().min(8),
 })
 
 export const loginSchema = z.object({

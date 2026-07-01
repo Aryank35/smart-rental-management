@@ -12,6 +12,9 @@ export interface User {
   email: string
   phone: string
   role: UserRole
+  /** Organization the user belongs to (admin owns it; tenant is a member). */
+  orgId?: string
+  status?: 'active' | 'inactive'
   avatarUrl?: string
   occupation?: string
   emergencyContact?: EmergencyContact

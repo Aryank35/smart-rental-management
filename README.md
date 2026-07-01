@@ -44,13 +44,13 @@ npm run dev                 # app  → http://localhost:5173
 
 The app opens at `/login`. Sign in with the seeded demo accounts:
 
-| Role   | Email                   | Password    |
-| ------ | ----------------------- | ----------- |
-| Tenant | `tenant@tenantflow.app` | `password1` |
-| Admin  | `admin@tenantflow.app`  | `password1` |
+| Role   | Email                   | Password          |
+| ------ | ----------------------- | ----------------- |
+| Tenant | `tenant@tenantflow.app` | `TenantFlow@2026` |
+| Admin  | `admin@tenantflow.app`  | `TenantFlow@2026` |
 
-New registrations go through the profile-setup step and persist in MongoDB. Visit
-`/components` for the **design system showcase** — every Phase 1 component, light & dark.
+Registering creates a **landlord (admin) account + organization**; tenants are created by
+an admin from the Tenants page. Visit `/components` for the **design system showcase**.
 
 ### Frontend-only scripts
 

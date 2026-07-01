@@ -1,10 +1,13 @@
 import { api } from '@/lib/api-client'
 import type {
   Complaint,
+  Notice,
   PaymentMethod,
   RentDetails,
   RentPayment,
   TenantDashboard,
+  TenantDocument,
+  TenantPayment,
   UtilityBillsDetails,
 } from './types'
 import type { ComplaintInput } from './schemas'
@@ -52,4 +55,28 @@ export function createComplaint(input: ComplaintInput): Promise<Complaint> {
 
 export function payBills(input: PayInput): Promise<PayResult> {
   return api.post<PayResult>('/tenant/pay', input)
+}
+
+export function getNotices(): Promise<Notice[]> {
+  return api.get<Notice[]>('/tenant/notices')
+}
+
+export function markNoticeRead(id: string): Promise<void> {
+  return api.post<void>(`/tenant/notices/${id}/read`)
+}
+
+export function getPaymentHistory(): Promise<TenantPayment[]> {
+  return api.get<TenantPayment[]>('/tenant/payments')
+}
+
+export function getDocuments(): Promise<TenantDocument[]> {
+  return api.get<TenantDocument[]>('/tenant/documents')
+}
+
+export function downloadDocument(
+  id: string
+): Promise<{ fileName: string; mimeType: string; dataUrl: string }> {
+  return api.get<{ fileName: string; mimeType: string; dataUrl: string }>(
+    `/tenant/documents/${id}/download`
+  )
 }

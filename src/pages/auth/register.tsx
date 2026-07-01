@@ -1,7 +1,7 @@
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Link } from 'react-router-dom'
-import { Mail, Phone, User } from 'lucide-react'
+import { Building2, Mail, Phone, User } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { PasswordInput } from '@/components/ui/password-input'
@@ -27,8 +27,10 @@ export function RegisterPage() {
   return (
     <div className="space-y-6">
       <div className="space-y-1">
-        <h1 className="text-2xl font-bold tracking-tight">Create your account</h1>
-        <p className="text-sm text-muted-foreground">Join TenantFlow in under a minute.</p>
+        <h1 className="text-2xl font-bold tracking-tight">Create your workspace</h1>
+        <p className="text-sm text-muted-foreground">
+          Set up your property-management account. You’ll add properties and tenants next.
+        </p>
       </div>
 
       <form
@@ -36,7 +38,7 @@ export function RegisterPage() {
         onSubmit={handleSubmit((d) => registerAction.mutate(d))}
         noValidate
       >
-        <FormField label="Full name" htmlFor="name" required error={errors.name?.message}>
+        <FormField label="Your name" htmlFor="name" required error={errors.name?.message}>
           <Input
             id="name"
             placeholder="Aarav Sharma"
@@ -44,6 +46,23 @@ export function RegisterPage() {
             autoComplete="name"
             error={!!errors.name}
             {...register('name')}
+          />
+        </FormField>
+
+        <FormField
+          label="Business / organization name"
+          htmlFor="orgName"
+          required
+          error={errors.orgName?.message}
+          hint="Shown to your tenants — e.g. Greenwood Properties"
+        >
+          <Input
+            id="orgName"
+            placeholder="Greenwood Properties"
+            leadingIcon={<Building2 />}
+            autoComplete="organization"
+            error={!!errors.orgName}
+            {...register('orgName')}
           />
         </FormField>
 

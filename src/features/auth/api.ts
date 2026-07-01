@@ -15,9 +15,19 @@ export function login(input: LoginInput): Promise<AuthSession> {
 export function register(input: RegisterInput): Promise<AuthSession> {
   return api.post<AuthSession>(
     '/auth/register',
-    { name: input.name, email: input.email, phone: input.phone, password: input.password },
+    {
+      name: input.name,
+      orgName: input.orgName,
+      email: input.email,
+      phone: input.phone,
+      password: input.password,
+    },
     { auth: false }
   )
+}
+
+export async function changePassword(currentPassword: string, newPassword: string): Promise<void> {
+  await api.put('/auth/password', { currentPassword, newPassword })
 }
 
 export async function requestPasswordReset(email: string): Promise<void> {

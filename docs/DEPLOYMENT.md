@@ -104,7 +104,7 @@ Now tell the backend to trust the frontend:
      `*.vercel.app` preview deploy through CORS too.
 2. Render redeploys automatically. Done.
 
-Open your Vercel URL, sign in with `tenant@tenantflow.app` / `password1`, and you're live.
+Open your Vercel URL, sign in with `admin@tenantflow.app` / `TenantFlow@2026`, and you're live.
 
 ---
 

@@ -1,5 +1,6 @@
 import { Router } from 'express'
 import {
+  changePassword,
   forgotPassword,
   login,
   me,
@@ -16,3 +17,4 @@ authRouter.post('/login', asyncHandler(login))
 authRouter.post('/forgot-password', asyncHandler(forgotPassword))
 authRouter.get('/me', requireAuth, asyncHandler(me))
 authRouter.put('/profile', requireAuth, asyncHandler(updateProfile))
+authRouter.put('/password', requireAuth, asyncHandler(changePassword))

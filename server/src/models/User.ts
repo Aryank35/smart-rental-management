@@ -16,6 +16,10 @@ const userSchema = new Schema(
     phone: { type: String, required: true, unique: true, trim: true },
     passwordHash: { type: String, required: true, select: false },
     role: { type: String, enum: ['tenant', 'admin'], default: 'tenant' },
+    /** The organization this user belongs to (admin owns it; tenant is a member). */
+    org: { type: Schema.Types.ObjectId, ref: 'Organization', index: true },
+    /** Tenant lifecycle — set to 'inactive' when offboarded. */
+    status: { type: String, enum: ['active', 'inactive'], default: 'active' },
     avatarUrl: { type: String },
     occupation: { type: String },
     emergencyContact: { type: emergencyContactSchema },
@@ -36,6 +40,8 @@ export function toPublicUser(user: UserDoc) {
     email: user.email,
     phone: user.phone,
     role: user.role,
+    orgId: user.org ? user.org.toString() : undefined,
+    status: user.status,
     avatarUrl: user.avatarUrl ?? undefined,
     occupation: user.occupation ?? undefined,
     emergencyContact: user.emergencyContact ?? undefined,

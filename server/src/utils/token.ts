@@ -4,6 +4,8 @@ import { env } from '../config/env.js'
 export interface JwtPayload {
   sub: string
   role: 'tenant' | 'admin'
+  /** Organization the user belongs to. Present on all tokens post-multi-org. */
+  org?: string
 }
 
 export function signToken(payload: JwtPayload): string {

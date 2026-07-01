@@ -3,6 +3,10 @@ import { Schema, model, type InferSchemaType, type Types } from 'mongoose'
 const tenancySchema = new Schema(
   {
     user: { type: Schema.Types.ObjectId, ref: 'User', required: true, unique: true },
+    org: { type: Schema.Types.ObjectId, ref: 'Organization', required: true, index: true },
+    property: { type: Schema.Types.ObjectId, ref: 'Property', index: true },
+    unit: { type: Schema.Types.ObjectId, ref: 'Unit', index: true },
+    // Denormalized for tenant-facing display (kept in sync when unit is assigned).
     propertyName: { type: String, required: true },
     roomNumber: { type: String, required: true },
     floor: { type: Number, required: true },

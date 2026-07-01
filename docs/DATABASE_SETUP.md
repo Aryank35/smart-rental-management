@@ -101,10 +101,10 @@ npm run seed
 
 You should see `✅ Seed complete.` Re-run any time to reset the data.
 
-| Role   | Email                   | Password    |
-| ------ | ----------------------- | ----------- |
-| Tenant | `tenant@tenantflow.app` | `password1` |
-| Admin  | `admin@tenantflow.app`  | `password1` |
+| Role   | Email                   | Password          |
+| ------ | ----------------------- | ----------------- |
+| Tenant | `tenant@tenantflow.app` | `TenantFlow@2026` |
+| Admin  | `admin@tenantflow.app`  | `TenantFlow@2026` |
 
 ---
 

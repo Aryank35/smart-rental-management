@@ -8,6 +8,7 @@ import { Schema, model, type InferSchemaType, type Types } from 'mongoose'
 const billSchema = new Schema(
   {
     user: { type: Schema.Types.ObjectId, ref: 'User', required: true, index: true },
+    org: { type: Schema.Types.ObjectId, ref: 'Organization', required: true, index: true },
     type: {
       type: String,
       enum: ['rent', 'electricity', 'water', 'penalty'],
